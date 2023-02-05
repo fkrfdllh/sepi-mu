@@ -25,7 +25,10 @@ module.exports = (sequelize, DataTypes) => {
 	}
 	DesiredActivity.init(
 		{
-			id: DataTypes.BIGINT,
+			id: {
+				type: DataTypes.BIGINT,
+				primaryKey: true,
+			},
 			habit_id: DataTypes.BIGINT,
 			activity_id: DataTypes.INTEGER,
 			is_positive: DataTypes.BOOLEAN,

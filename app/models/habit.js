@@ -31,7 +31,10 @@ module.exports = (sequelize, DataTypes) => {
 	}
 	Habit.init(
 		{
-			id: DataTypes.BIGINT,
+			id: {
+				type: DataTypes.BIGINT,
+				primaryKey: true,
+			},
 			respondent_id: DataTypes.BIGINT,
 			activity_id: DataTypes.INTEGER,
 		},

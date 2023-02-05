@@ -19,7 +19,10 @@ module.exports = (sequelize, DataTypes) => {
 	}
 	Occupation.init(
 		{
-			id: DataTypes.INTEGER,
+			id: {
+				type: DataTypes.INTEGER,
+				primaryKey: true,
+			},
 			name: DataTypes.STRING,
 		},
 		{

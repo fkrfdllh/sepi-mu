@@ -25,7 +25,10 @@ module.exports = (sequelize, DataTypes) => {
 	}
 	Respondent.init(
 		{
-			id: DataTypes.BIGINT,
+			id: {
+				type: DataTypes.BIGINT,
+				primaryKey: true,
+			},
 			name: DataTypes.STRING,
 			email: DataTypes.STRING,
 			age: DataTypes.INTEGER,
