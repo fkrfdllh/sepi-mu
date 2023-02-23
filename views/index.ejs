@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./partials/head') %>
+
+    <style>
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #72757e;
+            border-radius: 10px;
+        }
+
+        label {
+            color: #EDF2F4 !important;
+        }
+
+        .glow {
+            -webkit-animation: glow 1s ease-in-out infinite alternate;
+            -moz-animation: glow 1s ease-in-out infinite alternate;
+            animation: glow 1s ease-in-out infinite alternate;
+        }
+
+        #main {
+            background-image: url('assets/background.jpg');
+            background-color: #16161a;
+            background-blend-mode: darken;
+            font-family: 'Inter';
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main"
+        class="uk-flex uk-flex-middle uk-flex-center uk-background-image uk-background-cover uk-background-norepeat"
+        uk-height-viewport="expand: true">
+        <div class="uk-section">
+            <div class="uk-container">
+                <h1 class="uk-heading-medium uk-text-uppercase uk-text-center uk-text-bold" style="color: #adb5bd;">
+                    sepimu</h1>
+                <div class="uk-text-right">
+                    <p class="uk-text-lead uk-text-lowercase" style="color: #ced4da;">
+                        <span class="uk-text-italic">Kesepian</span> adalah perasaan yang sangat berharga
+                        untuk mengenali diri anda sendiri. Berbanggalah,
+                        karena
+                        dengan merasa kesepian, anda bisa mengembangkan diri anda menjadipribadi yang lebih baik
+                        lagi
+                    </p>
+                    <p class="uk-text-meta">
+                        <span class="uk-text-uppercase uk-text-bold">sepimu</span> akan membantumu menemukan
+                        kegiatan
+                        agar
+                        kamu
+                        tetap produktif
+                    </p>
+                </div>
+            </div>
+            <div class="uk-container">
+                <form id="calculateForm">
+                    <div class="uk-margin-small">
+                        <label class="uk-form-label">Pilih kebiasaanmu disaat kesepian</label>
+                    </div>
+                    <select name="habit" id="habit" class="uk-select" aria-label="Select" style="border-radius: 10px;">
+                        <option selected="selected" disabled>-- Pilih kebiasaan saat anda merasa kesepian --
+                        </option>
+                        <% for( let index = 0; index < activities.length; index++ ) { %>
+                        <option value="<%= activities[index].id %>">
+                            <%= activities[index].name.charAt(0).toUpperCase() + activities[index].name.slice(1) %>
+                        </option>
+                        <% } %>
+                    </select>
+                    <div class="uk-margin uk-flex uk-flex-right">
+                        <button type="submit" class="uk-button uk-button-primary"
+                            style="border-radius: 5px;">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultModal" class="uk-flex-top" uk-modal>
+        <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+
+            <button class="uk-modal-close-default" type="button" uk-close></button>
+
+            <div class="loading uk-flex uk-flex-middle uk-flex-center">
+                <div uk-spinner></div>
+            </div>
+
+            <div class="loaded" style="display: none">
+                <span class="uk-text-justify" id="head"></span>
+                <ul class="uk-list uk-list-divider" id="output"></ul>
+            </div>
+        </div>
+    </div>
+
+    <%- include('./partials/includes/scripts.ejs') %>
+
+    <script>
+        const habit = document.querySelector('#habit')
+        const form = document.querySelector('#calculateForm')
+        const modal = document.querySelector('#resultModal')
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault()
+
+            UIkit.modal(modal).show()
+
+            const result = await fetchData(habit.value)
+
+            document.querySelector('#head').innerHTML =
+                'Dari kebiasaanmu melakukan <span class="uk-text-bold">' + habit.options[
+                    habit
+                    .selectedIndex].text + ' </span>, kami menemukan ' + result.total +
+                ' orang yang melakukan hal yang sama. Kami memberikan saran:'
+
+            let temp = 0;
+
+            for (const item of result.data) {
+                let name = item.Activity.name;
+
+                let helper = []
+                for (let item of name.split(' ')) {
+                    helper.push(item[0].toUpperCase() + item.substring(1).toLowerCase())
+                }
+
+                name = helper.join(' ');
+
+                document.querySelector('#output').innerHTML += '<li class="uk-text-middle">' +
+                    `<p class="uk-text-bold">${name}</p>` +
+                    `<p class="uk-text-meta"><span class="uk-text-bold">${Math.round(item.total / result.total * 100)}%</span> (${item.total} dari ${result.total} orang)</p>` +
+                    '</li>'
+            }
+
+            if (temp.length !== 0) {
+                document.querySelector('.loading').setAttribute('style', 'display: none;')
+                document.querySelector('.loaded').removeAttribute('style')
+            }
+
+        })
+
+        const fetchData = async (data) => {
+            const response = await fetch(`/api/calculate?habit=${data}`)
+
+            if (response.status !== 200) {
+                throw new Error('Failed to fetch data')
+            }
+
+            const result = response.json()
+
+            return result
+        }
+    </script>
+</body>
+
+</html>
