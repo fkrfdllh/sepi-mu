@@ -1,7 +1,9 @@
 "use strict";
 
+const indexController = require("../app/controllers/index");
+
 module.exports = (route) => {
 	route.get("/", (req, res) => {
-		res.send("hello world");
+		indexController(req, res);
 	});
 };
