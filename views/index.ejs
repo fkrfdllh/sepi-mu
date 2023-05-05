@@ -88,7 +88,7 @@
     <div id="resultModal" class="uk-flex-top" uk-modal>
         <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
 
-            <button class="uk-modal-close-default" type="button" uk-close></button>
+            <button class="uk-modal-close-default" type="button" id="closeModal" uk-close></button>
 
             <div class="loading uk-flex uk-flex-middle uk-flex-center">
                 <div uk-spinner></div>
@@ -96,7 +96,7 @@
 
             <div class="loaded" style="display: none">
                 <span class="uk-text-justify" id="head"></span>
-                <ul class="uk-list uk-list-divider" id="output"></ul>
+                <ul class="uk-list uk-list-divider uk-list-striped" id="output"></ul>
             </div>
         </div>
     </div>
@@ -107,6 +107,7 @@
         const habit = document.querySelector('#habit')
         const form = document.querySelector('#calculateForm')
         const modal = document.querySelector('#resultModal')
+        const closeBtn = document.querySelector('#closeModal')
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault()
@@ -123,7 +124,9 @@
 
             let temp = 0;
 
-            for (const item of result.data) {
+            let output = ''
+
+            for (const [index, item] of await result.data.entries()) {
                 let name = item.Activity.name;
 
                 let helper = []
@@ -133,11 +136,14 @@
 
                 name = helper.join(' ');
 
-                document.querySelector('#output').innerHTML += '<li class="uk-text-middle">' +
-                    `<p class="uk-text-bold">${name}</p>` +
+                output += `<li class="uk-text-middle">` +
+                    `<p class="uk-text-bold">#${index + 1} ${name}</p>` +
                     `<p class="uk-text-meta"><span class="uk-text-bold">${Math.round(item.total / result.total * 100)}%</span> (${item.total} dari ${result.total} orang)</p>` +
                     '</li>'
             }
+
+
+            document.querySelector('#output').innerHTML = output
 
             if (temp.length !== 0) {
                 document.querySelector('.loading').setAttribute('style', 'display: none;')
